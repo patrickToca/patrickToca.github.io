@@ -1,0 +1,7 @@
+#to update the blog
+## checkout gh-pages
+
+git push -u origin gh-pages
+
+
+
