@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>Treaps: The Magical Awesome BBT</title>
+    <link href="/favicon.png" rel="icon"/>
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-44682116-1', 'pmjtoca.io');
+  ga('send', 'pageview');
+
+</script>
+
+    <link rel="stylesheet" href="/css/screen.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" type="text/css" href="/css/highlight.css"/>
+    <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet"/>
+    <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet"/>
+    <link rel="alternate" title='Moving toward what may in fact be the ultimate genocide: the destruction of the environment?!' href="/english/atom.xml" type="application/atom+xml">
+</head>
+<body>
+
+<div class="site">
+
+    <div class="menu">
+        <a class="extra" href="/">&laquo; français &raquo;</a>
+        <a href="/english">blog</a> |
+        <a href="/english/projects/">projects</a> |
+        <a href="/english/articles/">articles</a> |
+        <a href="/english/about/">about</a>
+    </div>
+ 	<div id="home">
+        <div id="page">
+    <div id="textblock">
+        <h1>Treaps: The Magical Awesome BBT</h1>
+
+            <p><a href="http://pavpanchekha.com/blog/treap.html" title="Permalink to Treaps: The Magical Awesome BBT" target="_blank">original document</a></p>
+
+<hr />
+
+<p><img src="/images/moebius/treap_the_bbt.jpg" alt="Tree" title="Balanced Binary Tree" />
+</p>
+
+<hr />
+
+<h2>by Pavel Panchekha - September 1, 2011</h2>
+
+<p>When you are about to use a Hash table, a map&hellip; consider using a BBT instead: ordering is embbedded and retrieving values will be faster on large sets.</p>
+
+<hr />
+
+<h1>Treaps: The Magical Awesome BBT</h1>
+
+<h2>Table of Contents</h2>
+
+<ul>
+<li><a href="#1">Binary Trees</a></li>
+<li><a href="#2">Heaps</a></li>
+<li><a href="#3">Our Goals</a></li>
+<li><a href="#4">Theoretical Backing</a></li>
+<li><a href="#5">Implementation</a>
+
+<ul>
+<li><a href="#6">Lookup and Containment</a></li>
+<li><a href="#7">Insertion</a></li>
+<li><a href="#8">Split &amp; Merge</a></li>
+<li><a href="#9">Deletion</a></li>
+</ul></li>
+<li><a href="#10">Usage</a></li>
+<li><a href="#11">A Quick Problem</a></li>
+<li><a href="#12">Wrapping Up</a></li>
+<li><a href="#13">Acknowledments</a></li>
+</ul>
+
+<p>Treaps are an awesome variant of balanced binary tree. By making some use of randomness, we have a BBT that is expected to be of logarithmic height, but is also easy to code, requiring none of the special-case bashing that characterizes red-black trees. Here, we&rsquo;ll code up a complete treap implementation in Lisp (particularly, pylisp) that is also fully functional.</p>
+
+<h2><a name='1'>Binary Trees</a></h2>
+
+<h6>Note</h6>
+
+<hr />
+
+<p>What I&rsquo;m calling a &ldquo;binary tree&rdquo; here is normally called a binary search tree. In true Lisp fashion, I&rsquo;m cutting out the unnecessary word &ldquo;search&rdquo; for now — we&rsquo;ll never have the occasion to discuss standard binary trees.</p>
+
+<hr />
+
+<p>Quick review: what&rsquo;s a &ldquo;binary tree&rdquo;? Simply put, it&rsquo;s a tree where each node has both a key and a value, and for each node, the left child has a smaller key and the right child has a larger key (we specifically avoid the case of non-unique keys, because we&rsquo;ll be discussing BBTs as a way of simulating maps). Recursing, we can see that the left subtree of any node has only nodes with smaller keys, and the right subtree of any node has only nodes with larger keys. This enables fast lookups for any key: in effect, we binary search the values. Of course, this only works if the left and right subtrees of all the nodes we pass are approximately equal in size. Now, how do we guarantee that? Well, that&rsquo;s the great problem of &ldquo;balancing&rdquo; a binary tree.</p>
+
+<p>There exist many, many algorithms to balance binary trees, but most of them are absolutely horrible, horrible things with thousands of special cases. Which is a pity, really, as binary trees lend themselves to functional code very well, unlike, say, hash tables, which cannot be copied in part. There are further benefits to balanced binary trees. For example, say you&rsquo;re writing an address book, and you need to store key-value pairs of contacts and phone numbers. A naive programmer would use a hash table, but this is incorrect. After all, you only ever display the names in order, and thus by storing the contacts as a binary tree, you transform (O(n \log n)) code (because of the sort) into (O(n)) code (just the iteration). The ability to send small updates as opposed to complete new hash tables is another advantage of balanced binary trees. And it is for this reason that we embark on our epic journey to balance binary trees using treaps.</p>
+
+<p>One crucial operation on binary trees is rotation. What this does is modify the tree in such a way as to preserve the order properties of the key.</p>
+
+<hr />
+
+<p><img src="/images/blog/treap-the-bbt/rotations.png" alt="Rotations" title="Rotations in BBT." />
+</p>
+
+<hr />
+
+<p>Left and right rotation in a binary search tree</p>
+
+<p>In the above picture, I&rsquo;m not actually drawing subtrees that don&rsquo;t matter — the greek letters represent full trees that we just preserve while rotating. If you&rsquo;re confused about which subtree ends up going where, take a deep breath, or maybe a short nap, and start from the top. In any case, it should be clear by inspection that this transformation retains the tree&rsquo;s order properties, which is really its most important feature. Further, it provides a way to move nodes upward in the tree — just as <code>x</code> moves upward as a result of the transformation above, we could have another rotation to move it yet further and further, until it became the root of the tree. In fact, any two binary trees can be transformed into each other using only tree rotations (assuming of course that they have the same number of elements). I should note that going left to right in the above diagram is called a right rotation, whereas right to left is called a left rotation.</p>
+
+<h2><a name='2'>Heaps</a></h2>
+
+<p>And now our second fundamental data structure that we will build upon: the &ldquo;heap&rdquo;. A heap is a very special-purpose data structure, often used to implement priority queues. The rule is simple: every node has a priority, and the priority of any node is less than those of its two children. And, working recursively, we see that any node has the lowest priority of its subtree.</p>
+
+<h6>Note</h6>
+
+<hr />
+
+<p>Technically, what I&rsquo;ve described can be properly called a &ldquo;min-heap&rdquo;, because the root is the minimum element. Alternatively, one can make each node larger than its children, creating a &ldquo;max-heap&rdquo;. Normally, one does not actually care which a heap is, since the main property is that the root is extremal.</p>
+
+<hr />
+
+<h2><a name='3'>Our Goals</a></h2>
+
+<p>Our goal is to create a treap implementation. We&rsquo;ll be using Lisp, in particular pylisp; feel free to follow along in whatever language you want. Our treap will support the following interface:</p>
+
+<p><code>(get key treap)</code>
+    Get the value associated with <code>key</code> from our treap.
+<code>(set key val treap)</code>
+    Return a new treap, which is the same as the old one except associates <code>key</code> with <code>val</code>.
+<code>(del key treap)</code>
+    Return a new treap, which is the same as the old except does not associate anything with <code>key</code>.
+<code>(in key treap)</code>
+    Return <code>#t</code> if <code>key</code> is in your treap, and <code>#f</code> if not.
+<code>(merge left right)</code>
+    <code>left</code> and <code>right</code> are proper treaps; all elements of <code>left</code> are lesser in key than any element of <code>right</code>, and vice-versa. Return the treap that contains all the elements from either <code>left</code> or <code>right</code>.
+<code>(split key treap)</code>
+    Return two treaps, one for all nodes with key less than <code>key</code>, and one for all nodes with larger keys. We assume that the treap does not contain <code>key</code>.
+<code>(treap-&amp;gt;list treap)</code>
+    Creates a nested list with format <code>(key left-child right-child)</code>.</p>
+
+<p>Note that since our treap will be fully functional, <code>set</code>, <code>del</code>, and <code>merge</code> will return new treaps with the necessary modifications made; furthermore, we will require that each of these methods, with the exception of <code>treap-&amp;gt;list</code>, run in (O(\log n)) time.</p>
+
+<h2><a name='4'>Theoretical Backing</a></h2>
+
+<p>We&rsquo;ll define a treap as a sort of cross-polination between a binary tree and a heap. In particular, each node will have a <code>key</code>, a <code>val</code>, and a priority <code>p</code>, as well as a left child <code>left</code> and a right child <code>right</code> (both of which may be <code>#0</code>, that is, null). We will require that our treap is a binary tree in terms of its keys and values, but a heap in terms of its priorities. Balancing will be achieved by assigning the priorities at random; we hope that this will tend to move middling values into the root of the tree. We&rsquo;ll prove this result — that we expect the height of the treap to be logarithmic — later. For cleanness of code, we&rsquo;ll further require that the priorities and keys be unique.</p>
+
+<p>Now, first, does there always exist a treap for a given set of keys and priorities? And, can we be sure that this treap is unique? A simple argument answers both in the positive. Clearly, the root node must be the node with lowest priority. This partitions the remaining nodes into two sets: those with key less than the root, and those with key greater. We recurse onto each of these sets, using as our base case the treap with a single node (clearly, it is unique).</p>
+
+<p>Alright, fine; what about proving that we&rsquo;ll get logarithmic height? Well, let&rsquo;s make the assumption that our random keys are being drawn from a uniform distribution. Now consider the root node, and ask: what&rsquo;s the size of the larger of its children, relative to the total tree size? Well, let&rsquo;s say without loss of generality that the right subtree is the larger one. Consider the probability that this child is less than three quarters of the whole tree. What&rsquo;s the probability of this? One half (verify). So, we expect that for every two levels, our largest subtree must shrink by a factor of four thirds. But wait, this means that our tree is shrinking geometrically! So, we have a logarithmic bound. And that means that we win, and have a good, balanced binary tree.</p>
+
+<h2><a name='5'>Implementation</a></h2>
+
+<p>Alright, so we&rsquo;ve got our theory down pat, and it&rsquo;s time to start firing our massive s-expression-spewing assault rifles. First things first, we have to define our nodes:</p>
+
+<pre><code>(class::simple Node (p key val left right))
+</code></pre>
+
+<p>For those of you unfamiliar with pylisp, this will define a class with fields <code>p</code>, <code>key</code>, and so on, and provide a basic constructor for this class.</p>
+
+<p>How might we transform this <code>Node</code> into a nice list? Well, nothing to it!</p>
+
+<pre><code>(def treap-&amp;gt;list (root)
+  (if (is root Node)
+    `(,root.key ,(treap-&amp;gt;list root.left) ,(treap-&amp;gt;list root.right))
+    root))
+</code></pre>
+
+<p>Pylisp note: the <code>is</code> method checks if an object is an instance of a certain class, here used to bottom out our recursion.</p>
+
+<p>Since they will be useful, let&rsquo;s also implement left and right rotations:</p>
+
+<pre><code>(def left-rotate (node)
+  (Node node.left.p node.left.key node.left.val
+    node.left.left
+    (Node node.p node.key node.val node.left.right node.right)))
+
+(def right-rotate (node)
+  (Node node.right.p node.right.key node.right.val
+    (Node node.p node.key node.val node.left node.right.left)
+    node.right.right))
+</code></pre>
+
+<h3><a name='6'>Lookup and Containment</a></h3>
+
+<p>Now, let&rsquo;s get cracking. First up is lookup, that is, the <code>get</code> function. Simple enough. Since our treap is already a binary tree, we can use the standard binary tree lookup algorithm, completely ignoring priorities:</p>
+
+<pre><code>(def get (key root)
+  (cond
+    ((not root)
+     (signal '(error not-found key get) key))
+    ((&amp;lt; key root.key)
+     (get key root.left))
+    ((&amp;gt; key root.key)
+     (get key root.right))
+    ((= key root.key)
+     root.val)))
+</code></pre>
+
+<p>Simple enough, eh? What about containment? Oh, it&rsquo;s even easier:</p>
+
+<pre><code>(def in (key root)
+  (cond
+    ((not root)
+     #f)
+    ((&amp;lt; key root.key)
+     (in key root.left))
+    ((&amp;gt; key root.key)
+     (in key root.right))
+    ((= key root.key)
+     #t)))
+</code></pre>
+
+<p>Alright, onward to mutation methods!</p>
+
+<h3><a name='7'>Insertion</a></h3>
+
+<p>Now on to the more difficult modification operations. How do we insert an element, how do we update a value? Well, we can spider down to the place we want to add the node very easily — it&rsquo;s the same as our <code>get</code> above. Now, we can just add the new node there, and if its priority is larger than its new parent&rsquo;s, we&rsquo;re golden. What if it&rsquo;s not? Well, then we have to move it upwards in the tree. How do we do that? Well, we mentioned how we move elements up and down before: it&rsquo;s called a tree rotation. So, all we have to do is, if our inserted element breaks the heap property of our treap, move it upwards by way of the appropriate rotation.</p>
+
+<p>This is a complicated method, so let&rsquo;s do it step-by-step. First, we&rsquo;ll need to import a module to get random numbers:</p>
+
+<pre><code>(use random)
+</code></pre>
+
+<p>Next, recall that we&rsquo;ll be generating a priority for this new element upon insertion, and then passing it up and down the call stack as necessary. This may seem like a waste of code — why not generate it once we get to the leaves and are ready to generate our new node? The simple answer is, &ldquo;trust me on this one&rdquo;. Anyway, here&rsquo;s our skeletal <code>set</code>:</p>
+
+<pre><code>(def set (key val root #:(p (random.randint 0 1000000000)))
+  (cond
+    ((not root)
+     ?) ; Just generate the new node
+    ((&amp;lt; key root.key)
+     ?) ; Recurse leftwards, then do a left-rotation if necessary
+    ((&amp;gt; key root.key)
+     ?) ; Same as the ( key root.key)
+ (let (new (Node root.p root.key root.val
+         root.left
+         (set key val root.right #:(p p))))
+   (if (&amp;lt; new.right.p new.p)
+     (right-rotate new)
+     new)))
+</code></pre>
+
+<p>Putting it together, we have:</p>
+
+<pre><code>(def set (key val root #:(p (random.randint 0 1000000000)))
+  (cond
+    ((not root)
+     (Node p key val #0 #0))
+    ((&amp;lt; key root.key)
+     (let (new (Node root.p root.key root.val
+        (set key val root.left #:(p p))
+        root.right))
+       (if (&amp;lt; new.left.p new.p)
+     (left-rotate new)
+     new)))
+    ((&amp;gt; key root.key)
+     (let (new (Node root.p root.key root.val
+        root.left
+        (set key val root.right #:(p p))))
+       (if (&amp;lt; new.right.p new.p)
+     (right-rotate new)
+     new)))
+    ((= key root.key)
+     (Node root.p root.key val root.left root.right))))
+</code></pre>
+
+<p>Don&rsquo;t worry, this is by far the scariest method we&rsquo;ll see. And note that this is completely functional — note a single <code>set!</code> call was made. Doesn&rsquo;t recursion mix so well with functional programming? Yes it does. Especially when treaps get involved.</p>
+
+<h3><a name='8'>Split &amp; Merge</a></h3>
+
+<p>Before we tackle deletion, let&rsquo;s take a quick detour to splitting and merging. What splitting does it produces two treaps from one, a left treap and a right treap, where the left treap contains only values less than a given key and the right treap contains only values greater than a given key. We assume that the key is not in the treap (otherwise, where would it go?). Of course, the left and right treaps that result from the splitting must themselves be valid treaps.</p>
+
+<p>How are we going to do this? Well, we&rsquo;re gonna cheat. We&rsquo;re gonna add in a new node, with the given key, but give it a really low priority so that it becomes the root. Then we can just pluck off left and right subtreaps and return those. Nice and simple, huh?</p>
+
+<pre><code>(def split (key root)
+  (let (ins (set key #0 root #:(p (- 1))))
+    `(,ins.left ,ins.right)))
+</code></pre>
+
+<p>Nice and easy, there we go. We&rsquo;re inserting a node with priority <code>-1</code>, which is guaranteed to be the smallest priority (all other nodes have a positive priority from zero to a billion). And because insertion is functional, we never have to explicitly remove our dummy node.</p>
+
+<p>Now, what about merging? Merging takes two treaps that might have been the result of a <code>split</code>, and merges them into one treap. How? Well, given the two treaps, one can easily find the root element of the new treap — it&rsquo;s the root of one of the two treaps. Now, we have our root (say it came from the right tree), and we have its right child — that&rsquo;s just its original right child. After all, that right child already contains all of the larger elements, by definition. What about its left child? Well, we still have two treaps worth of elements to consider: the original left child of our new root, and the original left treap. And so we merge <strong>those</strong>, recursively.</p>
+
+<pre><code>(def merge (left right)
+  (cond
+    ((not left)
+     right)
+    ((not right)
+     left)
+    ((&amp;lt; left.p right.p)
+     (Node left.p  left.key  left.val  left.left (merge left.right right)))
+    (#t
+     (Node right.p right.key right.val (merge right.left left) right.right))))
+</code></pre>
+
+<p>What&rsquo;s that <code>#t</code> doing there? Well, that&rsquo;s the default clause in my conditional, you might say. The reason it isn&rsquo;t <code>(&amp;gt; left.p right.p)</code> is to guard against the minute chance of non-unique priorities.</p>
+
+<h6>Note</h6>
+
+<hr />
+
+<p>The first time I wrote this, there were errors. They are now fixed. The new code is deceptively similar; but then again, even minor changes are crucial in recursive functions (since those errors propogate).</p>
+
+<hr />
+
+<h3><a name='9'>Deletion</a></h3>
+
+<p>Alright. You might say, this treap stuff seems okay so far, but so do red-black trees, and then you hit deletion. As you&rsquo;re about to see, deletion for treaps is very nice and intuitive. <strong>Intuitive</strong>. That&rsquo;s right. Onward!</p>
+
+<p>Now, consider the node you want to delete. If your node is a leaf node, your job is easy — just delete it. If your node has only one child, your job is also pretty easy — just remove the node and connect its single child in its place. But what if the node has two children? Then, when you remove it, you have to somehow combine two the two child subtreaps into one. But <strong>how</strong>? How might we do such a merger?</p>
+
+<p>Oh, yeah, <code>merge</code>.</p>
+
+<p>The rest of the method is a simple recursion back and forth:</p>
+
+<pre><code>(def del (key root)
+  (cond
+    ((not root)
+     (signal '(error not-found key del) key))
+    ((&amp;lt; key root.key)
+     (Node root.p root.key root.val (del key root.left) root.right))
+    ((&amp;gt; key root.key)
+     (Node root.p root.key root.val root.left (del key root.right)))
+    ((= key root.key)
+     (merge root.left root.right))))
+</code></pre>
+
+<p>Note the pure, happy simplicity of this method! Oh, the joys of treaps!</p>
+
+<h2><a name='10'>Usage</a></h2>
+
+<p>I like to add some basic tester code to the bottom of my files. Not exhaustive unit tests, mind, you (we don&rsquo;t want import taking forever, do we?), but some basic usage, just to make sure everything works. Let&rsquo;s do that here:</p>
+
+<pre><code>(use tester)
+
+(test &quot;Sanity check&quot;
+  (let (treap #0)
+    (set! treap (set 5 'a treap))
+    (set! treap (set 7 'b treap))
+    (assert (= (get 5 treap) 'a))
+    (assert (= (get 7 treap) 'b))
+    (set! treap (set 2 'c treap))
+    (assert (= (get 2 treap) 'c))
+    (set! treap (set 2 'd treap))
+    (assert (= (get 2 treap) 'd))
+    (set! treap (del 5 treap))
+    (assert (not (in 5 treap)))))
+
+(test &quot;Fairly Balanced&quot;
+  (let (treap #0)
+    (signal '(warning test slow-test) &quot;Balancing test&quot;)
+    (for (i (range 1000))
+      (set! treap (set i #0 treap))
+      (print i))
+    (assert (&amp;lt; (depth treap) 40))))
+</code></pre>
+
+<h2><a name='11'>A Quick Problem</a></h2>
+
+<p>Suppose we want to create a sorted array; that is, we want to be able to retrieve the (n)-th largest key, in (O(\log n)) time. How do we do this? There is a rather simple way, involving treaps (or, really, any balanced binary tree). As a hint, I suggest considering the fact that we&rsquo;re not using the value stored in each node for anything, thus leaving it open to be appropriated for some purpose.</p>
+
+<h2><a name='12'>Wrapping Up</a></h2>
+
+<p>Overall, the code above weighs in at under 100 lines, and that&rsquo;s including the tester code. Perhaps that&rsquo;s not impressive. If it isn&rsquo;t, go write red-black trees in Java. We&rsquo;ll see who&rsquo;s laughing then.</p>
+
+<p>What about cool optimizations? Anything in that department? Well, it&rsquo;s a good thing you ask. Because, you see, we&rsquo;ve got all of these priorities floating around. And of course they&rsquo;re supposed to be random. But don&rsquo;t you just get the urge to fiddle with them?</p>
+
+<p>One simple optimization is to decrease the priority of a node every time it is accessed (whether by <code>get</code> or <code>set</code>). This will slowly migrate your commonly-accessed nodes up to the top of the treap, where they&rsquo;re faster to get at. Of course, this might make accesses slower, as you need to rewrite the treap. Your mileage may vary. Look before you leap, benchmark when in doubt, beware of dog.</p>
+
+<p>I&rsquo;m not providing code for this variant. Because in my experience, on pylisp, this behavior is rarely what you want, unless of course you have a treap of several thousand elements but you only ever access three of them. In which case you need a better brain, not a better algorithm. But I&rsquo;ll leave this optimization as an exercise to the reader. As a hint, I&rsquo;d suggest going over your code for <code>split</code> carefully if you do optimize this, and also make sure to deal with the case where priorities are non-unique.</p>
+
+<h3><a name='13'>Acknowledgments</a></h3>
+
+<p>Thanks to Sam Fingeret for first introducing me to treaps, and for helping out with the details of the proof that the height is expected to be logarithmic. Thank you as well to Mark Velednitsky for editing this writeup, even though he can&rsquo;t stand the sight of Lisp.</p>
+
+<p>Thanks also to folks on Hacker News who provided a lively discussion.</p>
+
+            <hr/>
+            
+
+            <a href="/english/about/">
+                <small>Disclaimer</small>
+            </a>
+
+            <h1>Comments</h1>
+
+            <div id="disqus_thread"></div>
+
+            <script type="text/javascript">
+  var disqus_shortname = 'pmjtocablog';
+  var disqus_developer = '0';
+  var disqus_identifier = '/blog/english/2013/11/25/treaps-the-magical-balanced-binary-tree/';
+  var disqus_url = 'http://patrickToca.github.io//blog/english/2013/11/25/treaps-the-magical-balanced-binary-tree/';
+  var disqus_script = 'embed.js';
+  (function () {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  }());
+</script>
+
+
+    </div>
+</div>
+
+
+    </div>
+
+
+    <div><img src="/images/moebius/blog_logo.jpg" alt="blog logo" height="auto" width="100%"/></div>
+
+    <div class="footer">
+        <div class="contact">
+            &copy; 2013
+            <a href='mailto:pmjtoca@gmail.com'>Patrick M.J. Toca</a>
+            <a href="/english/atom.xml" rel="subscribe-rss" title="Subscribe via RSS">RSS</a>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>Bell Labs and CSP Threads.</title>
+    <link href="/favicon.png" rel="icon"/>
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-44682116-1', 'pmjtoca.io');
+  ga('send', 'pageview');
+
+</script>
+
+    <link rel="stylesheet" href="/css/screen.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" type="text/css" href="/css/highlight.css"/>
+    <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet"/>
+    <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet"/>
+    <link rel="alternate" title='Moving toward what may in fact be the ultimate genocide: the destruction of the environment?!' href="/english/atom.xml" type="application/atom+xml">
+</head>
+<body>
+
+<div class="site">
+
+    <div class="menu">
+        <a class="extra" href="/">&laquo; français &raquo;</a>
+        <a href="/english">blog</a> |
+        <a href="/english/projects/">projects</a> |
+        <a href="/english/articles/">articles</a> |
+        <a href="/english/about/">about</a>
+    </div>
+ 	<div id="home">
+        <div id="page">
+    <div id="textblock">
+        <h1>Bell Labs and CSP Threads.</h1>
+
+            <p><a href="http://swtch.com/~rsc/thread/" target="_blank">original document</a></p>
+
+<hr />
+
+<p><img src="/images/moebius/me.jpg" alt="CSP Threads" title="Bell Labs and CSP Threads" />
+</p>
+
+<hr />
+
+<h2>by Russ Cox - read - March 19, 2014</h2>
+
+<h1>Bell Labs and CSP Threads</h1>
+
+<p><strong>Introduction</strong></p>
+
+<p>This page is a slice of the history of concurrent programming, focusing on one particular lineage of Hoare&rsquo;s language of communicating sequential processes (CSP) <a href="http://swtch.com#1"><a href="http://swtch.com/~rsc/">1</a></a> <a href="http://swtch.com#1a">[1a]</a>. Concurrent programming in this style is interesting for reasons not of efficiency but of clarity. That is, it is a widespread mistake to think only of concurrent programming as a means to increase performance, <em>e.g.</em>, to overlap disk I/O requests, to reduce latency by prefetching results to expected queries, or to take advantage of multiple processors. Such advantages are important but not relevant to this discussion. After all, they can be realized in other styles, such as asynchronous event-driven programming. Instead, we are interested in concurrent programming because it provides a natural abstraction that can make some programs much simpler.</p>
+
+<p><strong>What this is not</strong></p>
+
+<p>Most computer science undergraduates are forced to read Andrew Birrell&rsquo;s [“An Introduction to Programming with Threads.”]The SRC threads model is the one used by most thread packages currently available. The problem with all of these is that they are too low-level. Unlike the communication primitive provided by Hoare, the primitives in the SRC-style threading module must be combined with other techniques, usually shared memory, in order to be used effectively. In general, programmers tend not to build their own higher-level constructs, and are left frustrated by needing to pay attention to such low-level details.</p>
+
+<p>For the moment, push Birrell&rsquo;s tutorial out of your mind. This is a different thread model. If you approach it as a different thread model, you may well find it much easier to understand.</p>
+
+<p><strong>Communicating Sequential Processes</strong></p>
+
+<p>By 1978, there were many proposed methods in use for communication and synchronization in the context of programming multiprocessors. Shared memory was the most common communication mechanism, and semaphores, critical regions, and monitors were among the synchronization mechanisms. C. A. R. Hoare addressed both issues with a single language primitive: synchronous communication. In Hoare&rsquo;s CSP language, processes communicate by sending or receiving values from named unbuffered channels. Since the channels are unbuffered, the send operation blocks until the value has been transferred to a receiver, thus providing a mechanism for synchronization.</p>
+
+<p>One of Hoare&rsquo;s examples is that of reformatting 80-column cards for printing on a 125-column printer. In his solution, one process reads a card at a time, sending the disassembled contents character by character to a second process. This second process assembles groups of 125 characters, sending the groups to the line printer. This sounds trivial, but in the absence of buffered I/O libraries, the necessary bookkeeping involved in a single-process solution is onerous. In fact, buffered I/O libraries are really just encapsulations of these two sorts of processes that export the single-character communication interface.</p>
+
+<p>As another example, which Hoare credits to Doug McIlroy, consider the generation of all primes less than a thousand. The sieve of Eratosthenes can be simulated by a pipeline of processes executing the following pseudocode:</p>
+
+<pre><code>p = get a number from left neighbor
+print p
+loop:
+    n = get a number from left neighbor
+    if (p does not divide n)
+        send n to right neighbor
+</code></pre>
+
+<p>A generating process can feed the numbers 2, 3, 4, &hellip;, 1000 into the left end of the pipeline: the first process in the line eliminates the multiples of 2, the second eliminates the multiples of 3, the third eliminates the multiples of 5, and so on:</p>
+
+<p>The linear pipeline nature of the examples thus far is misrepresentative of the general nature of CSP, but even restricted to linear pipelines, the model is quite powerful. The power has been forcefully demonstrated by the success of the filter-and-pipeline approach for which the Unix operating system is well known <a href="http://swtch.com#2"><a href="http://science.webhostinggeeks.com/bell-laboratorije">2</a></a> Indeed, pipelines predate Hoare&rsquo;s paper. In an internal Bell Labs memo dated October 11, 1964, Doug McIlroy was toying with ideas that would become Unix pipelines: “We should have some ways of coupling programs like garden hose&ndash;screw in another segment when it becomes necessary to massage data in another way. This is the way of IO also.” <a href="http://swtch.com#3"><a href="http://swtch.com#1">3</a></a></p>
+
+<p>Hoare&rsquo;s communicating processes are more general than typical Unix shell pipelines, since they can be connected in arbitrary patterns. In fact, Hoare gives as an example a 3x3 matrix of processes somewhat like the prime sieve that can be used to multiply a vector by a 3x3 square matrix.</p>
+
+<p>Of course, the Unix pipe mechanism doesn&rsquo;t require the linear layout; only the shell syntax does. McIlroy reports toying with syntax for a shell with general plumbing early on but not liking the syntax enough to implement it (personal communication, 2011). Later shells did support some restricted forms of non-linear pipelines. Rochkind&rsquo;s 2dsh supports dags; Tom Duff&rsquo;s rc supports trees.</p>
+
+<p>Hoare&rsquo;s language was novel and influential, but lacking in a few key aspects. The main defect is that the unbuffered channels used for communication are not first-class objects: they cannot be stored in variables, passed as arguments to functions, or sent across channels. As a result of this, the communication structure must be fixed while writing the program. Hence we must write a program to print the first 1000 primes rather than the first <em>n</em> primes, and to multiply a vector by a 3x3 matrix rather than an <em>n_x_n</em> matrix.</p>
+
+<p><strong>Pan and Promela</strong></p>
+
+<p>In 1980, barely two years after Hoare&rsquo;s paper, Gerard Holzmann and Rob Pike created a protocol analyzer called pan that takes a CSP dialect as input. Pan&rsquo;s CSP dialect had concatenation, selection, and looping, but no variables. Even so, Holzmann reports that “Pan found its first error in a Bell Labs data-switch control protocol on 21 November 1980. ” <a href="http://swtch.com#14"><a href="http://swtch.com#8">14</a></a>. That dialect may well have been the first CSP language at Bell Labs, and it certainly provided Pike with experience using and implementing a CSP-like language, his first of many.</p>
+
+<p>Holzmann&rsquo;s protocol analyzer developed into the Spin model checker and its Promela language, which features first-class channels in the same way as Newsqueak (q.v.).</p>
+
+<p><strong>Newsqueak</strong></p>
+
+<p>Moving in a different direction, Luca Cardelli and Rob Pike developed the ideas in CSP into the Squeak mini-language <a href="http://swtch.com#4"><a href="http://swtch.com#1a">4</a></a> for generating user interface code. (This Squeak is distinct from the Squeak Smalltalk implementation.) Pike later expanded Squeak into the fully-fledged programming language Newsqueak <a href="http://swtch.com#5">11</a> which begat Plan 9&rsquo;s Alef <a href="http://swtch.com#7"><a href="http://swtch.com#2">7</a></a> <a href="http://swtch.com#8"><a href="http://swtch.com#3">8</a></a>, Inferno&rsquo;s Limbo <a href="http://swtch.com#9"><a href="http://swtch.com#14">9</a></a>, and Google&rsquo;s Go <a href="http://swtch.com#13"><a href="http://swtch.com#7">13</a></a>. The main semantic advantage of Newsqueak over Squeak is that Newsqueak treats communications channels as first-class objects: unlike in CSP and Squeak, channels <em>can</em> be stored in variables, passed as arguments to functions, and sent across channels. This in turn enables the programmatic construction of the communication structure, thus allowing the creation of more complex structures than would be reasonable to design by hand. In particular, Doug McIlroy demonstrated how the communication facilities of Newsqueak can be employed to write elegant programs for manipulating symbolic power series <a href="http://swtch.com#10"><a href="http://swtch.com#4">10</a></a>. Similar attempts in traditional languages tend to mire in bookkeeping. In a similar vein, Rob Pike demonstrated how the communication facilities can be employed to break out of the common event-based programming model, writing a concurrent window system <a href="http://swtch.com#11"><a href="http://swtch.com#5">11</a></a>.</p>
+
+<p><strong>Alef</strong></p>
+
+<p>Alef <a href="http://swtch.com#7"><a href="http://swtch.com#2">7</a></a> <a href="http://swtch.com#8"><a href="http://swtch.com#3">8</a></a> was a language designed by Phil Winterbottom to apply the Newsqueak ideas to a full-fledged systems programming language. Alef has two types of what we have been calling processes: procs and threads. The program is organized into one or more procs, which are shared-memory operating system processes that can be preemptively scheduled. Each proc contains one or more tasks, which are cooperatively scheduled coroutines. Note that each task is assigned to a particular proc: they do not migrate between procs.</p>
+
+<p>The main use of procs is to provide contexts that can block for I/O independently of the main tasks. (Plan 9 has no select call, and even on Unix you need multiple procs if you want to overlap computation with non-network I/O.) The Acme paper <a href="http://swtch.com#12">19</a> has a nice brief discussion of procs and threads, as do [the lecture notes about the Plan 9 window system], also mentioned below.</p>
+
+<p><strong>Limbo</strong></p>
+
+<p>The Inferno operating system is a Plan 9 spinoff intended for set-top boxes. Its programming language, Limbo <a href="http://swtch.com#9"><a href="http://swtch.com#14">9</a></a>, was heavily influenced by Alef. It removed the distinction between procs and tasks, effectively having just procs, though they were of lighter weight than what most people think of as processes. All parallelism is preemptive. It is interesting that despite this, the language provides no real support for locking. Instead, the channel communication typically provides enough synchronization and encourages programmers to arrange that there is always a clear owner for any piece of data. Explicit locking is unnecessary.</p>
+
+<p><strong>Libthread</strong></p>
+
+<p>Back in the Plan 9 world, the Alef compilers turned out to be difficult to maintain as Plan 9 was ported to ever more architectures. Libthread was originally created to port Alef programs to C, so that the Alef compilers could be retired. Alef&rsquo;s procs and tasks are called procs and threads in libthread. The [manual page] is the definitive reference.</p>
+
+<p><strong>Go</strong></p>
+
+<p>Rob Pike and Ken Thompson moved on to Google and placed CSP at the center of the Go language&rsquo;s concurrency support.</p>
+
+<p><strong>Getting Started</strong></p>
+
+<p>To get a feel for the model, especially how processes and threads interact, it is worth reading the Alef User&rsquo;s Guide <a href="http://swtch.com#8"><a href="http://swtch.com#3">8</a></a>. The first thirty slides of this presentation<a href="http://wwwhome.cs.utwente.nl/~sape/gos/chap15.pdf">23</a> are a good introduction to how Alef constructs are represented in C.</p>
+
+<p>The best examples of the power of the CSP model are McIlroy&rsquo;s and Pike&rsquo;s papers, mentioned above <a href="http://swtch.com#10"><a href="http://swtch.com#4">10</a></a> <a href="http://swtch.com#11"><a href="http://swtch.com#5">11</a></a>.</p>
+
+<p>Rob Pike&rsquo;s home page contains lecture notes from a course on concurrent programming: an [introduction], and slides about the two aforementioned papers: [squinting] and [window system]. The last of the three provides a good example of how Plan 9 programs typically use procs and tasks.</p>
+
+<p>Rob Pike gave a tech talk at Google<a href="http://www.youtube.com/watch?v=jgVhBThJdXc">27</a> that provides a good introduction (57 minute video).</p>
+
+<p>Rob Pike&rsquo;s half of his 2010 Google I/O talk with Russ Cox<a href="http://www.youtube.com/watch?v=jgVhBThJdXc">27</a> shows how to use channels and Go&rsquo;s concurrency to implement a load balancing work management system.</p>
+
+<p><strong>Related Resources</strong></p>
+
+<p>John Reppy<a href="http://www.cs.uchicago.edu/~jhr">28</a> has applied the same ideas to ML, producing Concurrent ML<a href="http://cml.cs.uchicago.edu/">29</a>. He used CML to build, among other things, the eXene<a href="http://people.cs.uchicago.edu/~jhr/eXene/">30</a> multithreaded (non-event-driven) X Window System toolkit.</p>
+
+<p><strong>References</strong></p>
+
+<p><a href="http://swtch.com/~rsc/">1</a> C. A. R. Hoare, “Communicating Sequential Processes,” <em>Communications of the ACM</em> 21(8) (August 1978), 666-677.</p>
+
+<p>[1a]C. A. R. Hoare, <em>Communicating Sequential Processes</em>. Prentice Hall, Englewood Cliffs, New Jersey, 1985.</p>
+
+<p><a href="http://science.webhostinggeeks.com/bell-laboratorije">2</a> Michael S. Mahoney, ed.,  <em>The Unix Oral History Project, Release 0: The Beginning</em> <a href="http://www.princeton.edu/~hos/Mahoney/expotape.htm">31</a></p>
+
+<p><a href="http://swtch.com#1">3</a> M. Douglas McIlroy, internal Bell Labs memorandum, October 1964.</p>
+
+<p><a href="http://swtch.com#1a">4</a> Luca Cardelli and Rob Pike, “Squeak: a Language for Communicating with Mice,” <em>Computer Graphics</em>, 19(3) (July 1985: SIGGRAPH &lsquo;85 Proceedings), 199-204.</p>
+
+<p>Rob Pike, “Newsqueak: a Language for Communicating with Mice,” <em>Computing Science Technical Report 143</em>, AT&amp;T Bell Laboratories, Murray Hill, 1989.</p>
+
+<p><a href="http://swtch.com#2">7</a> Phil Winterbottom, “Alef Language Reference Manual,” in <em>Plan 9 Programmer&rsquo;s Manual: Volume Two</em>, AT&amp;T, Murray Hill, 1995.</p>
+
+<p><a href="http://swtch.com#3">8</a> Bob Flandrena, “Alef Users&rsquo; Guide,” in <em>Plan 9 Programmer&rsquo;s Manual: Volume Two</em>, AT&amp;T, Murray Hill, 1995.</p>
+
+<p><a href="http://swtch.com#14">9</a> Dennis M. Ritchie, “The Limbo Programming Language,”<a href="http://www.vitanuova.com/inferno/papers/limbo.html">38</a> in <em>Inferno Programmer&rsquo;s Manual, Volume 2</em>, Vita Nuova Holdings Ltd., York, 2000.</p>
+
+<p><a href="http://swtch.com#4">10</a> M. Douglas McIlroy, “Squinting at Power Series,” <em>Software&ndash;Practice and Experience</em>, 20(7) (July 1990), 661-683.</p>
+
+<p><a href="http://swtch.com#5">11</a> Rob Pike, “A Concurrent Window System,” <em>Computing Systems</em>, 2(2) 133-153.</p>
+
+<p>Rob Pike, “Acme: A User Interface for Programmers,”<a href="http://plan9.bell-labs.com/sys/doc/acme.html">41</a> <em>Proceedings of the Winter 1994 USENIX Conference</em>, 223-234.</p>
+
+<p><a href="http://swtch.com#7">13</a> golang.org, “The Go Programming Language”<a href="http://golang.org/">22</a>.</p>
+
+<p><a href="http://swtch.com#8">14</a> Gerard Holzmann, “Spin&rsquo;s Roots”<a href="http://spinroot.com/spin/Doc/roots.html">42</a>.</p>
+
+<p><a href="http://swtch.com#9">15</a> Gerard Holzmann, “Promela Language Reference”<a href="http://spinroot.com/spin/Man/promela.html">43</a>.</p>
+
+            <hr/>
+            
+
+            <a href="/english/about/">
+                <small>Disclaimer</small>
+            </a>
+
+            <h1>Comments</h1>
+
+            <div id="disqus_thread"></div>
+
+            <script type="text/javascript">
+  var disqus_shortname = 'pmjtocablog';
+  var disqus_developer = '0';
+  var disqus_identifier = '/blog/english/2014/03/19/Bell-Labs-and-CSP-Threads/';
+  var disqus_url = 'http://patrickToca.github.io//blog/english/2014/03/19/Bell-Labs-and-CSP-Threads/';
+  var disqus_script = 'embed.js';
+  (function () {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  }());
+</script>
+
+
+    </div>
+</div>
+
+
+    </div>
+
+
+    <div><img src="/images/moebius/blog_logo.jpg" alt="blog logo" height="auto" width="100%"/></div>
+
+    <div class="footer">
+        <div class="contact">
+            &copy; 2013
+            <a href='mailto:pmjtoca@gmail.com'>Patrick M.J. Toca</a>
+            <a href="/english/atom.xml" rel="subscribe-rss" title="Subscribe via RSS">RSS</a>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
