@@ -1,0 +1,7 @@
+.idea
+.idea/**
+*.iml
+.git
+.git/**
+HOW_to_update.txt
+
