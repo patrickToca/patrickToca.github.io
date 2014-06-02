@@ -139,7 +139,7 @@ AmCharts.ready(function () {
         {
             "id": "Title-2",
             "size": 14,
-            "text": " Résultats officiels (avec abstentions, blanc et nuls). "
+            "text": " Résultats officiels (avec abstentions, votes blancs et nuls). "
         }
     ];
 
