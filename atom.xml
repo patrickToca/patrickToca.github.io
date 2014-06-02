@@ -22,10 +22,14 @@
 
 <hr />
 
-<h2>L&rsquo;abstention, le parti qui arrive largement en tête&hellip; est toujours ignoré.</h2>
+<h1>L&rsquo;abstention, le parti qui arrive largement en tête&hellip;</h1>
+
+<h1>&hellip; toujours ignorée.</h1>
+
+<hr>
 
 <div id="chartdiv1" style="width: 100%; height: 400px;"></div>
-
+<hr>
 <div id="chartdiv2" style="width: 100%; height: 400px;"></div>
 
 <hr />
