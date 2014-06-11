@@ -145,14 +145,13 @@ ul.posts span {
 
 .menu {
     position: fixed;
-    height: 2em;
-    width: 22em;
+    height: 1.25em;
     color: rgba(49, 106, 185, 0.98);
     font-weight: bold;
     margin-bottom: 0.5em;
     margin-top: 0em;
     margin-left: 2em;
-    border-bottom: 4px solid #eee;
+    /*border-bottom: 4px solid #eee;*/
     background-color: rgba(146, 193, 255, 0.75);
     padding: 2px;
     border: 1px solid rgba(49, 106, 185, 0.98);
