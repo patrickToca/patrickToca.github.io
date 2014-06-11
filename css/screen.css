@@ -148,6 +148,7 @@ ul.posts span {
     margin-bottom: 0.5em;
     margin-top: 0em;
     border-bottom: 4px solid #eee;
+    background-color: rgba(146, 193, 255, 0.60);
 }
 
 .site .menu a {
