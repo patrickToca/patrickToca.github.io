@@ -139,9 +139,10 @@ ul.posts span {
     text-align: left;
     width: 80%;
     margin: 2em auto 4em auto;
+    top: 10%;
 }
 
-.site .menu {
+.menu {
     position: fixed;
     color: #316ab9;
     font-weight: bold;
@@ -151,7 +152,7 @@ ul.posts span {
     background-color: rgba(146, 193, 255, 0.60);
 }
 
-.site .menu a {
+.menu a {
     color: #2d5682;
 }
 
