@@ -142,6 +142,7 @@ ul.posts span {
 }
 
 .site .menu {
+    position: fixed;
     color: #316ab9;
     font-weight: bold;
     margin-bottom: 0.5em;
