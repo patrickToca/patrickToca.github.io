@@ -164,6 +164,10 @@ ul.posts span {
     color: #2d5682;
 }
 
+.menu a:hover {
+    color: #82286f;
+}
+
 #home {
     margin-top: 2em;
 }
