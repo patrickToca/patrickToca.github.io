@@ -3,7 +3,7 @@
         var s = document.createElement('script');
         s.type = 'text/javascript';
         s.async = true;
-        s.src = '/js/' + language + '/search.js?2014-06-11T10:32:19+01:00';
+        s.src = '/js/' + language + '/search.js?2014-06-11T10:33:37+01:00';
         var x = document.getElementsByTagName('script')[0];
         x.parentNode.insertBefore(s, x);
     }
