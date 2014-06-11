@@ -155,6 +155,10 @@ ul.posts span {
     color: #2d5682;
 }
 
+#home {
+    margin-top: 2em;
+}
+
 .title {
     color: #316ab9;
     font-weight: bold;
