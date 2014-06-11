@@ -142,10 +142,11 @@ ul.posts span {
     top: 10%;
 }
 
+
 .menu {
     position: fixed;
-    height: 2em;
-    width; 16em;
+    height: 4em;
+    width: 20em;
     color: rgba(49, 106, 185, 0.98);
     font-weight: bold;
     margin-bottom: 0.5em;
