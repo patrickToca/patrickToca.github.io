@@ -148,6 +148,7 @@ ul.posts span {
     font-weight: bold;
     margin-bottom: 0.5em;
     margin-top: 0em;
+    margin-left: 2em;
     border-bottom: 4px solid #eee;
     background-color: rgba(146, 193, 255, 0.60);
 }
