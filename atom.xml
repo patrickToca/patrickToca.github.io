@@ -1463,7 +1463,7 @@ Secrétaire</p>
 
 <hr>
 
-<p><video width="320" height="240" controls>
+<p><video width="720" height="auto" controls>
     <source src="/images/videos/Resaux_Salariat_Statut_du_Producteur.mp4" type="video/mp4">
     Your browser does not support the video tag.
   </video>
