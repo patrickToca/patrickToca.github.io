@@ -4,10 +4,11 @@
 var chart1, chart2;
 var legend1, legend2;
 
-var chartData1 = [{
+var chartData1 = [
+    {
     "category1": "FN",
     "column-1": "24.85"
-},
+    },
     {
         "category1": "UMP",
         "column-1": "20.8"
