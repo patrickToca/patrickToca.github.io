@@ -48,8 +48,7 @@
 
 <hr />
 
-<p><img src="/images/blog/go-data-structures-interfaces/Interfaces.jpg" alt="Interfaces" title="Interfaces" />
-</p>
+<p><img src="/images/blog/go-data-structures-interfaces/Interfaces.jpg" alt="Interfaces" title="Interfaces" /></p>
 
 <hr />
 
@@ -132,13 +131,11 @@ func (i Binary) Get() uint64 {
 
 <p>As a warmup, a value of type Binary is just a 64-bit integer made up of two 32-bit words (like in the <a href="http://research.swtch.com/2009/11/go-data-structures.html" target="_blank">last post</a>, we&rsquo;ll assume a 32-bit machine; this time memory grows down instead of to the right):</p>
 
-<p><img src="/images/blog/go-data-structures-interfaces/gointer1.png" alt="Interfaces" title="gointer1" />
-</p>
+<p><img src="/images/blog/go-data-structures-interfaces/gointer1.png" alt="Interfaces" title="gointer1" /></p>
 
 <p>Interface values are represented as a two-word pair giving a pointer to information about the type stored in the interface and a pointer to the associated data. Assigning b to an interface value of type Stringer sets both words of the interface value.</p>
 
-<p><img src="/images/blog/go-data-structures-interfaces/gointer2.png" alt="Interfaces" title="gointer2" />
-</p>
+<p><img src="/images/blog/go-data-structures-interfaces/gointer2.png" alt="Interfaces" title="gointer2" /></p>
 
 <p>(The pointers contained in the interface value are gray to emphasize that they are implicit, not directly exposed to Go programs.)</p>
 
@@ -165,22 +162,19 @@ s.tab-&gt;fun[0](s.data) : it calls the appropriate function pointer from the it
 
 <p>First, if the interface type involved is empty—it has no methods—then the itable serves no purpose except to hold the pointer to the original type. In this case, the itable can be dropped and the value can point at the type directly:</p>
 
-<p><img src="/images/blog/go-data-structures-interfaces/gointer3.png" alt="Interfaces" title="gointer3" />
-</p>
+<p><img src="/images/blog/go-data-structures-interfaces/gointer3.png" alt="Interfaces" title="gointer3" /></p>
 
 <p>Whether an interface type has methods is a static property—either the type in the source code says interface{} or it says interace{ methods&hellip; }—so the compiler knows which representation is in use at each point in the program.</p>
 
 <p>Second, if the value associated with the interface value can fit in a single machine word, there&rsquo;s no need to introduce the indirection or the heap allocation. If we define Binary32 to be like Binary but implemented as a uint32, it could be stored in an interface value by keeping the actual value in the second word:</p>
 
-<p><img src="/images/blog/go-data-structures-interfaces/gointer4.png" alt="Interfaces" title="gointer4" />
-</p>
+<p><img src="/images/blog/go-data-structures-interfaces/gointer4.png" alt="Interfaces" title="gointer4" /></p>
 
 <p>Whether the actual value is being pointed at or inlined depends on the size of the type. The compiler arranges for the functions listed in the type&rsquo;s method table (which get copied into the itables) to do the right thing with the word that gets passed in. If the receiver type fits in a word, it is used directly; if not, it is dereferenced. The diagrams show this: in the Binary version far above, the method in the itable is (*Binary).String, while in the Binary32 example, the method in the itable is Binary32.String not (*Binary32).String.</p>
 
 <p>Of course, empty interfaces holding word-sized (or smaller) values can take advantage of both optimizations:</p>
 
-<p><img src="/images/blog/go-data-structures-interfaces/gointer5.png" alt="Interfaces" title="gointer5" />
-</p>
+<p><img src="/images/blog/go-data-structures-interfaces/gointer5.png" alt="Interfaces" title="gointer5" /></p>
 
 <p><strong>Method Lookup Performance</strong></p>
 
@@ -266,7 +260,7 @@ func main() {
   var disqus_shortname = 'pmjtocablog';
   var disqus_developer = '0';
   var disqus_identifier = '/blog/english/2013/09/14/go-data-structures-interfaces/';
-  var disqus_url = 'http://patrickToca.github.io//blog/english/2013/09/14/go-data-structures-interfaces/';
+  var disqus_url = 'http://patrickTocaORIGINAL.github.io//blog/english/2013/09/14/go-data-structures-interfaces/';
   var disqus_script = 'embed.js';
   (function () {
     var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

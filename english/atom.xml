@@ -3,10 +3,10 @@
 
   
   <title><![CDATA[Moving toward what may in fact be the ultimate genocide: the destruction of the environment?!]]></title>
-  <link href="http://patrickToca.github.io//atom.xml" rel="self"/>
-  <link href="http://patrickToca.github.io//"/>
-  <updated>2014-08-05T22:38:00Z</updated>
-  <id>http://patrickToca.github.io//</id>
+  <link href="http://patrickTocaORIGINAL.github.io//atom.xml" rel="self"/>
+  <link href="http://patrickTocaORIGINAL.github.io//"/>
+  <updated>2015-06-23T09:03:00Z</updated>
+  <id>http://patrickTocaORIGINAL.github.io//</id>
   <author>
     <name><![CDATA[Patrick M.J. Toca]]></name>
     <email><![CDATA[pmjtoca@gmail.com]]></email>
@@ -14,11 +14,88 @@
 
   
 	
+  
+	
+	  <entry>
+	    <title type="html"><![CDATA[Code Sample.]]></title>
+	    <link href="http://patrickTocaORIGINAL.github.io//blog/english/2015/06/23/a-code-sample/"/>
+	    <updated>2015-06-23T00:00:00+00:00</updated>
+	    <id>http://patrickTocaORIGINAL.github.io//blog/english/2015/06/23/a-code-sample/</id>
+	    <content type="html"><![CDATA[<h2>by Patrick Toca - read - June 23, 2015</h2>
+
+<h1>A code presentation draft</h1>
+
+<p><strong>Introduction</strong></p>
+
+<p>This page is a first attempt to generate a Code Sample, just to check the highlight processing of {% Code Block: Go %}.</p>
+
+<p>The Code:
+<pre class="hl">
+<span class="hl com">/*  This is a block comment Indeed  */</span>
+<span class="hl kwa">package</span> main</p>
+
+<p><span class="hl kwa">import</span> <span class="hl opt">(</span>
+    <span class="hl str">&quot;fmt&quot;</span>
+    <span class="hl str">&quot;strings&quot;</span>
+    <span class="hl str">&quot;unicode&quot;</span>
+<span class="hl opt">)</span></p>
+
+<p><span class="hl kwa">func</span> <span class="hl kwd">main</span><span class="hl opt">() {</span>
+    s <span class="hl opt">:=</span> <span class="hl str">&quot; &lt; p&gt;  the-tes t-. * ca se&lt;/ p&gt;  &quot;</span>
+    fmt<span class="hl opt">.</span><span class="hl kwd">Printf</span><span class="hl opt">(</span><span class="hl str">&quot;Trimmed s =</span><span class="hl ipl">%q</span><span class="hl str"></span><span class="hl esc">\n</span><span class="hl str">&quot;</span><span class="hl opt">,</span> <span class="hl kwd">TrimSpace</span><span class="hl opt">(</span>s<span class="hl opt">,</span> <span class="hl str">&quot;&quot;</span><span class="hl opt">))</span>
+<span class="hl opt">}</span></p>
+
+<p><span class="hl kwa">func</span> <span class="hl kwd">TrimSpace</span><span class="hl opt">(</span>input <span class="hl kwb">string</span><span class="hl opt">,</span> replacer <span class="hl kwb">string</span><span class="hl opt">)</span> <span class="hl kwb">string</span> <span class="hl opt">{</span>
+    <span class="hl kwa">var</span> listOfSpace <span class="hl opt">[]</span><span class="hl kwb">string</span>
+    <span class="hl kwa">var</span> output <span class="hl kwb">string</span>
+    <span class="hl slc">//build the listOfSpace, all runes that are &lsquo;Space&rsquo;</span>
+    <span class="hl kwa">for</span> c <span class="hl opt">:=</span> <span class="hl kwa">range</span> <span class="hl kwd">RunesFromRange</span><span class="hl opt">(</span>unicode<span class="hl opt">.</span>Space<span class="hl opt">) {</span>
+        <span class="hl kwa">if</span> c <span class="hl opt">&lt;</span> <span class="hl num">0x600</span> <span class="hl opt">{</span>
+            listOfSpace <span class="hl opt">=</span> <span class="hl kwc">append</span><span class="hl opt">(</span>listOfSpace<span class="hl opt">,</span> <span class="hl kwb">string</span><span class="hl opt">(</span>unicode<span class="hl opt">.</span><span class="hl kwd">ToUpper</span><span class="hl opt">(</span>c<span class="hl opt">)))</span>
+            fmt<span class="hl opt">.</span><span class="hl kwd">Printf</span><span class="hl opt">(</span><span class="hl str">&quot;</span><span class="hl ipl">%0</span><span class="hl str">5x</span> <span class="hl ipl">%s</span><span class="hl str"></span><span class="hl esc">\n</span><span class="hl str">&quot;</span><span class="hl opt">,</span> c<span class="hl opt">,</span> <span class="hl kwb">string</span><span class="hl opt">(</span>c<span class="hl opt">))</span>
+        <span class="hl opt">}</span>
+    <span class="hl opt">}</span>
+    <span class="hl slc">//For each &lsquo;space&rsquo;, replace it</span>
+    <span class="hl kwa">for</span> _<span class="hl opt">,</span> space <span class="hl opt">:=</span> <span class="hl kwa">range</span> listOfSpace <span class="hl opt">{</span>
+        <span class="hl kwa">if</span> strings<span class="hl opt">.</span><span class="hl kwd">Contains</span><span class="hl opt">(</span>input<span class="hl opt">,</span> space<span class="hl opt">) {</span>
+            <span class="hl slc">//sign: Replace(s, old, new string, n int) string.</span>
+            <span class="hl slc">//If n&lt;0 there is no limit on the number of replacements.</span>
+            output <span class="hl opt">=</span> strings<span class="hl opt">.</span><span class="hl kwd">Replace</span><span class="hl opt">(</span>input<span class="hl opt">,</span> space<span class="hl opt">,</span> replacer<span class="hl opt">, -</span><span class="hl num">1</span><span class="hl opt">)</span>
+            <span class="hl kwa">return</span> output
+        <span class="hl opt">}</span>
+        output <span class="hl opt">=</span> input
+    <span class="hl opt">}</span>
+    <span class="hl kwa">return</span> output
+<span class="hl opt">}</span></p>
+
+<p><span class="hl kwa">func</span> <span class="hl kwd">RunesFromRange</span><span class="hl opt">(</span>tab <span class="hl opt">*</span>unicode<span class="hl opt">.</span>RangeTable<span class="hl opt">) &lt;-</span><span class="hl kwa">chan</span> <span class="hl kwb">rune</span> <span class="hl opt">{</span>
+    res <span class="hl opt">:=</span> <span class="hl kwc">make</span><span class="hl opt">(</span><span class="hl kwa">chan</span> <span class="hl kwb">rune</span><span class="hl opt">)</span>
+    <span class="hl kwa">go func</span><span class="hl opt">() {</span>
+        <span class="hl kwa">defer</span> <span class="hl kwc">close</span><span class="hl opt">(</span>res<span class="hl opt">)</span>
+        <span class="hl kwa">for</span> _<span class="hl opt">,</span> r16 <span class="hl opt">:=</span> <span class="hl kwa">range</span> tab<span class="hl opt">.</span>R16 <span class="hl opt">{</span>
+            <span class="hl kwa">for</span> c <span class="hl opt">:=</span> r16<span class="hl opt">.</span>Lo<span class="hl opt">;</span> c <span class="hl opt">&lt;=</span> r16<span class="hl opt">.</span>Hi<span class="hl opt">;</span> c <span class="hl opt">+=</span> r16<span class="hl opt">.</span>Stride <span class="hl opt">{</span>
+                res <span class="hl opt">&lt;-</span> <span class="hl kwb">rune</span><span class="hl opt">(</span>c<span class="hl opt">)</span>
+            <span class="hl opt">}</span>
+        <span class="hl opt">}</span>
+        <span class="hl kwa">for</span> _<span class="hl opt">,</span> r32 <span class="hl opt">:=</span> <span class="hl kwa">range</span> tab<span class="hl opt">.</span>R32 <span class="hl opt">{</span>
+            <span class="hl kwa">for</span> c <span class="hl opt">:=</span> r32<span class="hl opt">.</span>Lo<span class="hl opt">;</span> c <span class="hl opt">&lt;=</span> r32<span class="hl opt">.</span>Hi<span class="hl opt">;</span> c <span class="hl opt">+=</span> r32<span class="hl opt">.</span>Stride <span class="hl opt">{</span>
+                res <span class="hl opt">&lt;-</span> <span class="hl kwb">rune</span><span class="hl opt">(</span>c<span class="hl opt">)</span>
+            <span class="hl opt">}</span>
+        <span class="hl opt">}</span>
+    <span class="hl opt">}()</span>
+    <span class="hl kwa">return</span> res
+<span class="hl opt">}</span>
+</pre></p>
+<hr/><a href="http://patrickTocaORIGINAL.github.io//english/about/">Disclaimer</a>]]></content>
+	  </entry>
+  	
+  
+	
 	  <entry>
 	    <title type="html"><![CDATA[An Answer to the Question: What is Enlightenment?]]></title>
-	    <link href="http://patrickToca.github.io//blog/english/2014/08/05/sapere-aude/"/>
+	    <link href="http://patrickTocaORIGINAL.github.io//blog/english/2014/08/05/sapere-aude/"/>
 	    <updated>2014-08-05T00:00:00+00:00</updated>
-	    <id>http://patrickToca.github.io//blog/english/2014/08/05/sapere-aude/</id>
+	    <id>http://patrickTocaORIGINAL.github.io//blog/english/2014/08/05/sapere-aude/</id>
 	    <content type="html"><![CDATA[<pre><code>Enlightenment is man's emergence from his self-imposed nonage. 
 
 Nonage is the inability to use one's own understanding without
@@ -36,8 +113,7 @@ understanding,&quot;is therefore the motto of the enlightenment.
 
 <hr />
 
-<p><img src="http://patrickToca.github.io//images/moebius/enlightenment.jpg" alt="Enlightenment" title="Enlightenment" />
-</p>
+<p><img src="http://patrickTocaORIGINAL.github.io//images/moebius/enlightenment.jpg" alt="Enlightenment" title="Enlightenment" /></p>
 
 <hr />
 
@@ -68,7 +144,7 @@ understanding,&quot;is therefore the motto of the enlightenment.
 <p>I have placed the main point of enlightenment &ndash; the escape of men from their self-imposed immaturity &ndash; chiefly in matters of religion because our rulers have no interest in playing guardian with respect to the arts and sciences and also because religious incompetence is not only the most harmful but also the most degrading of all. But the manner of thinking of the head of a state who favors religious enlightenment goes further, and he sees that there is no danger to his lawgiving in allowing his subjects to make public use of their reason and to publish their thoughts on a better formulation of his legislation and even their open-minded criticisms of the laws already made. Of this we have a shining example wherein no monarch is superior to him we honor.</p>
 
 <p>But only one who is himself enlightened, is not afraid of shadows, and has a numerous and well-disciplined army to assure public peace, can say: &ldquo;Argue as much as you will, and about what you will, only obey!&rdquo; A republic could not dare say such a thing. Here is shown a strange and unexpected trend in human affairs in which almost everything, looked at in the large, is paradoxical. A greater degree of civil freedom appears advantageous to the freedom of mind of the people, and yet it places inescapable limitations upon it. A lower degree of civil freedom, on the contrary, provides the mind with room for each man to extend himself to his full capacity. As nature has uncovered from under this hard shell the seed for which she most tenderly cares &ndash; the propensity and vocation to free thinking &ndash; this gradually works back upon the character of the people, who thereby gradually become capable of acting freely; finally, it affects the principles of government, which finds it to its advantage to treat men, who are now more than machines, in accordance with their dignity.</p>
-<hr/><a href="http://patrickToca.github.io//english/about/">Disclaimer</a>]]></content>
+<hr/><a href="http://patrickTocaORIGINAL.github.io//english/about/">Disclaimer</a>]]></content>
 	  </entry>
   	
   
@@ -77,9 +153,9 @@ understanding,&quot;is therefore the motto of the enlightenment.
 	
 	  <entry>
 	    <title type="html"><![CDATA[Spain&#39;s PODEMOS.]]></title>
-	    <link href="http://patrickToca.github.io//blog/english/2014/07/27/Spain-s-Podemos/"/>
+	    <link href="http://patrickTocaORIGINAL.github.io//blog/english/2014/07/27/Spain-s-Podemos/"/>
 	    <updated>2014-07-27T00:00:00+00:00</updated>
-	    <id>http://patrickToca.github.io//blog/english/2014/07/27/Spain-s-Podemos/</id>
+	    <id>http://patrickTocaORIGINAL.github.io//blog/english/2014/07/27/Spain-s-Podemos/</id>
 	    <content type="html"><![CDATA[<pre><code>- 1 - This paper describes the roots and fundamental principles 
 of the popular movement PODEMOS.
 
@@ -94,8 +170,7 @@ of the popular movement PODEMOS.
 
 <hr />
 
-<p><img src="http://patrickToca.github.io//images/moebius/me.jpg" alt="Spain's Podemos" title="Spain's Podemos." />
-</p>
+<p><img src="http://patrickTocaORIGINAL.github.io//images/moebius/me.jpg" alt="Spain's Podemos" title="Spain's Podemos." /></p>
 
 <hr />
 
@@ -162,8 +237,7 @@ of the popular movement PODEMOS.
 
 <hr />
 
-<p><img src="http://patrickToca.github.io//images/blog/podemos/pabloIglesias_listLeaderEuopeanElections-Podemos.jpg" alt="Leader of PODEMOS during the european elections" title="Pablo Iglesias." />
-</p>
+<p><img src="http://patrickTocaORIGINAL.github.io//images/blog/podemos/pabloIglesias_listLeaderEuopeanElections-Podemos.jpg" alt="Leader of PODEMOS during the european elections" title="Pablo Iglesias." /></p>
 
 <p>Illustration : Pablo Iglesias, Podemos list leader for the euopean elections.</p>
 
@@ -194,16 +268,16 @@ of the popular movement PODEMOS.
 <p><a id="note-2"></a>[2]: <a href="http://www.publico.es/publico-tv/program/59/latuerka">http://www.publico.es/publico-tv/program/59/latuerka</a></p>
 
 <p><em><a href="#topOfArticle">Back to top</a></em></p>
-<hr/><a href="http://patrickToca.github.io//english/about/">Disclaimer</a>]]></content>
+<hr/><a href="http://patrickTocaORIGINAL.github.io//english/about/">Disclaimer</a>]]></content>
 	  </entry>
   	
   
 	
 	  <entry>
 	    <title type="html"><![CDATA[The brink of mass extinction.]]></title>
-	    <link href="http://patrickToca.github.io//blog/english/2014/07/23/the-brink-of-mass-extinction/"/>
+	    <link href="http://patrickTocaORIGINAL.github.io//blog/english/2014/07/23/the-brink-of-mass-extinction/"/>
 	    <updated>2014-07-23T00:00:00+00:00</updated>
-	    <id>http://patrickToca.github.io//blog/english/2014/07/23/the-brink-of-mass-extinction/</id>
+	    <id>http://patrickTocaORIGINAL.github.io//blog/english/2014/07/23/the-brink-of-mass-extinction/</id>
 	    <content type="html"><![CDATA[<pre><code>- 1 - This paper references a lot of sources.
 
 - 2 - The observed facts presented here are far less frightening
@@ -223,8 +297,7 @@ of this 'propaganda'.
 
 <hr />
 
-<p><img src="http://patrickToca.github.io//images/moebius/moebius-arzac-750.jpg" alt="Mass Extinction" title="The brink of mass-extinction." />
-</p>
+<p><img src="http://patrickTocaORIGINAL.github.io//images/moebius/moebius-arzac-750.jpg" alt="Mass Extinction" title="The brink of mass-extinction." /></p>
 
 <hr />
 
@@ -600,7 +673,7 @@ _ - Native American proverb_</p>
 <p><a id="note-76"></a>[76]: <a href="http://www.youtube.com/watch?v=G1L4GUA8arY">http://www.youtube.com/watch?v=G1L4GUA8arY</a></p>
 
 <p><em><a href="#topOfArticle">Back to top</a></em></p>
-<hr/><a href="http://patrickToca.github.io//english/about/">Disclaimer</a>]]></content>
+<hr/><a href="http://patrickTocaORIGINAL.github.io//english/about/">Disclaimer</a>]]></content>
 	  </entry>
   	
   
@@ -615,9 +688,9 @@ _ - Native American proverb_</p>
 	
 	  <entry>
 	    <title type="html"><![CDATA[European Elections 2014 in France: 2 presentations.]]></title>
-	    <link href="http://patrickToca.github.io//blog/english/2014/06/02/European-Elections-2014-2-results/"/>
+	    <link href="http://patrickTocaORIGINAL.github.io//blog/english/2014/06/02/European-Elections-2014-2-results/"/>
 	    <updated>2014-06-02T00:00:00+00:00</updated>
-	    <id>http://patrickToca.github.io//blog/english/2014/06/02/European-Elections-2014-2-results/</id>
+	    <id>http://patrickTocaORIGINAL.github.io//blog/english/2014/06/02/European-Elections-2014-2-results/</id>
 	    <content type="html"><![CDATA[<p><em>by Patrick Toca - 2 June 2014</em></p>
 
 <hr />
@@ -634,11 +707,10 @@ _ - Native American proverb_</p>
 
 <hr />
 
-<p><img src="http://patrickToca.github.io//images/moebius/panel-3.jpg" alt="elections-2014" title="A lulling song and good children go to heaven." />
-</p>
+<p><img src="http://patrickTocaORIGINAL.github.io//images/moebius/panel-3.jpg" alt="elections-2014" title="A lulling song and good children go to heaven." /></p>
 
 <hr />
-<hr/><a href="http://patrickToca.github.io//english/about/">Disclaimer</a>]]></content>
+<hr/><a href="http://patrickTocaORIGINAL.github.io//english/about/">Disclaimer</a>]]></content>
 	  </entry>
   	
   
@@ -647,13 +719,12 @@ _ - Native American proverb_</p>
 	
 	  <entry>
 	    <title type="html"><![CDATA[Elections of April 2014 in France: a dissident interpretation of results.]]></title>
-	    <link href="http://patrickToca.github.io//blog/english/2014/05/05/about-the-french-elections-avril-2014/"/>
+	    <link href="http://patrickTocaORIGINAL.github.io//blog/english/2014/05/05/about-the-french-elections-avril-2014/"/>
 	    <updated>2014-05-05T00:00:00+00:00</updated>
-	    <id>http://patrickToca.github.io//blog/english/2014/05/05/about-the-french-elections-avril-2014/</id>
+	    <id>http://patrickTocaORIGINAL.github.io//blog/english/2014/05/05/about-the-french-elections-avril-2014/</id>
 	    <content type="html"><![CDATA[<hr />
 
-<p><img src="http://patrickToca.github.io//images/moebius/moebius-arzac-750.jpg" alt="Elections" title="Capitalism" />
-</p>
+<p><img src="http://patrickTocaORIGINAL.github.io//images/moebius/moebius-arzac-750.jpg" alt="Elections" title="Capitalism" /></p>
 
 <hr />
 
@@ -713,8 +784,7 @@ _ - Native American proverb_</p>
 
 <hr />
 
-<p><img src="http://patrickToca.github.io//images/moebius/revolte-or-not.jpg" alt="People's voice" title="People's voice." />
-</p>
+<p><img src="http://patrickTocaORIGINAL.github.io//images/moebius/revolte-or-not.jpg" alt="People's voice" title="People's voice." /></p>
 
 <hr />
 
@@ -844,22 +914,21 @@ _ - Native American proverb_</p>
 
 <pre><code>TODOS
 </code></pre>
-<hr/><a href="http://patrickToca.github.io//english/about/">Disclaimer</a>]]></content>
+<hr/><a href="http://patrickTocaORIGINAL.github.io//english/about/">Disclaimer</a>]]></content>
 	  </entry>
   	
   
 	
 	  <entry>
 	    <title type="html"><![CDATA[Bell Labs and CSP Threads.]]></title>
-	    <link href="http://patrickToca.github.io//blog/english/2014/03/19/Bell-Labs-and-CSP-Threads/"/>
+	    <link href="http://patrickTocaORIGINAL.github.io//blog/english/2014/03/19/Bell-Labs-and-CSP-Threads/"/>
 	    <updated>2014-03-19T00:00:00+00:00</updated>
-	    <id>http://patrickToca.github.io//blog/english/2014/03/19/Bell-Labs-and-CSP-Threads/</id>
+	    <id>http://patrickTocaORIGINAL.github.io//blog/english/2014/03/19/Bell-Labs-and-CSP-Threads/</id>
 	    <content type="html"><![CDATA[<p><a href="http://swtch.com/~rsc/thread/" target="_blank">original document</a></p>
 
 <hr />
 
-<p><img src="http://patrickToca.github.io//images/moebius/me.jpg" alt="CSP Threads" title="Bell Labs and CSP Threads" />
-</p>
+<p><img src="http://patrickTocaORIGINAL.github.io//images/moebius/me.jpg" alt="CSP Threads" title="Bell Labs and CSP Threads" /></p>
 
 <hr />
 
@@ -978,7 +1047,7 @@ loop:
 <p><a href="http://swtch.com#8">14</a> Gerard Holzmann, “Spin&rsquo;s Roots”<a href="http://spinroot.com/spin/Doc/roots.html">42</a>.</p>
 
 <p><a href="http://swtch.com#9">15</a> Gerard Holzmann, “Promela Language Reference”<a href="http://spinroot.com/spin/Man/promela.html">43</a>.</p>
-<hr/><a href="http://patrickToca.github.io//english/about/">Disclaimer</a>]]></content>
+<hr/><a href="http://patrickTocaORIGINAL.github.io//english/about/">Disclaimer</a>]]></content>
 	  </entry>
   	
   
@@ -987,15 +1056,14 @@ loop:
 	
 	  <entry>
 	    <title type="html"><![CDATA[Treaps: The Magical Awesome BBT]]></title>
-	    <link href="http://patrickToca.github.io//blog/english/2013/11/25/treaps-the-magical-balanced-binary-tree/"/>
+	    <link href="http://patrickTocaORIGINAL.github.io//blog/english/2013/11/25/treaps-the-magical-balanced-binary-tree/"/>
 	    <updated>2013-11-25T00:00:00+00:00</updated>
-	    <id>http://patrickToca.github.io//blog/english/2013/11/25/treaps-the-magical-balanced-binary-tree/</id>
+	    <id>http://patrickTocaORIGINAL.github.io//blog/english/2013/11/25/treaps-the-magical-balanced-binary-tree/</id>
 	    <content type="html"><![CDATA[<p><a href="http://pavpanchekha.com/blog/treap.html" title="Permalink to Treaps: The Magical Awesome BBT" target="_blank">original document</a></p>
 
 <hr />
 
-<p><img src="http://patrickToca.github.io//images/moebius/treap_the_bbt.jpg" alt="Tree" title="Balanced Binary Tree" />
-</p>
+<p><img src="http://patrickTocaORIGINAL.github.io//images/moebius/treap_the_bbt.jpg" alt="Tree" title="Balanced Binary Tree" /></p>
 
 <hr />
 
@@ -1048,8 +1116,7 @@ loop:
 
 <hr />
 
-<p><img src="http://patrickToca.github.io//images/blog/treap-the-bbt/rotations.png" alt="Rotations" title="Rotations in BBT." />
-</p>
+<p><img src="http://patrickTocaORIGINAL.github.io//images/blog/treap-the-bbt/rotations.png" alt="Rotations" title="Rotations in BBT." /></p>
 
 <hr />
 
@@ -1323,22 +1390,21 @@ loop:
 <p>Thanks to Sam Fingeret for first introducing me to treaps, and for helping out with the details of the proof that the height is expected to be logarithmic. Thank you as well to Mark Velednitsky for editing this writeup, even though he can&rsquo;t stand the sight of Lisp.</p>
 
 <p>Thanks also to folks on Hacker News who provided a lively discussion.</p>
-<hr/><a href="http://patrickToca.github.io//english/about/">Disclaimer</a>]]></content>
+<hr/><a href="http://patrickTocaORIGINAL.github.io//english/about/">Disclaimer</a>]]></content>
 	  </entry>
   	
   
 	
 	  <entry>
 	    <title type="html"><![CDATA[What I&#39;d like to see on front pages of newspapers.]]></title>
-	    <link href="http://patrickToca.github.io//blog/english/2013/10/24/what-we-would-like-to-read-in-media/"/>
+	    <link href="http://patrickTocaORIGINAL.github.io//blog/english/2013/10/24/what-we-would-like-to-read-in-media/"/>
 	    <updated>2013-10-24T00:00:00+00:00</updated>
-	    <id>http://patrickToca.github.io//blog/english/2013/10/24/what-we-would-like-to-read-in-media/</id>
+	    <id>http://patrickTocaORIGINAL.github.io//blog/english/2013/10/24/what-we-would-like-to-read-in-media/</id>
 	    <content type="html"><![CDATA[<p><a href="http://www.belfasttelegraph.co.uk/opinion/noam-chomsky-what-id-like-to-see-on-front-pages-of-newspapers-29654898.html" target="_blank">original document</a></p>
 
 <hr />
 
-<p><img src="http://patrickToca.github.io//images/moebius/Incal.jpg" alt="Capitalism" title="The name of what the present is." />
-</p>
+<p><img src="http://patrickTocaORIGINAL.github.io//images/moebius/Incal.jpg" alt="Capitalism" title="The name of what the present is." /></p>
 
 <hr />
 
@@ -1595,21 +1661,26 @@ RECD for short, pronounced &quot;wrecked&quot; by accident.
 <p>As always through history, there are two trajectories. One leads towards oppression and destruction. The other leads towards freedom and justice. And as always - to adapt Martin Luther King&rsquo;s famous phrase - there are ways to bend the arc of the moral universe towards justice and freedom - and by now even towards survival.</p>
 
 <p>Source: This is a transcript from the DW Global Media Forum in Bonn, Germany republished with permission from chomsky.info</p>
-<hr/><a href="http://patrickToca.github.io//english/about/">Disclaimer</a>]]></content>
+<hr/><a href="http://patrickTocaORIGINAL.github.io//english/about/">Disclaimer</a>]]></content>
 	  </entry>
   	
   
 	
+  
+	
 	  <entry>
 	    <title type="html"><![CDATA[The french constitution of 1793.]]></title>
-	    <link href="http://patrickToca.github.io//blog/english/2013/10/16/1793-french-constitution/"/>
+	    <link href="http://patrickTocaORIGINAL.github.io//blog/english/2013/10/16/1793-french-constitution/"/>
 	    <updated>2013-10-16T00:00:00+00:00</updated>
-	    <id>http://patrickToca.github.io//blog/english/2013/10/16/1793-french-constitution/</id>
+	    <id>http://patrickTocaORIGINAL.github.io//blog/english/2013/10/16/1793-french-constitution/</id>
 	    <content type="html"><![CDATA[<hr />
 
-<p>Reading this text, it is extremely surprising to measure the thoughtfulness and care the authors of that time were dedicating to the <strong>common welfare</strong>.
-Since then, we have known a long, slow and systematic regression.
-We have much to <strong>re-learn</strong> from our forefathers and foremothers.</p>
+<pre><code>    It is extremely surprising to realize  
+    the thoughtfulness dedicated to the &quot;common welfare&quot;
+    by the authors of that time.
+    Since then, we have known a continuous and saddening regression.
+    We have much to re-discover from our fore-fathers and fore-mothers.
+</code></pre>
 
 <hr />
 
@@ -1982,30 +2053,26 @@ Secretary</p>
 
 <hr />
 
-<p><img src="http://patrickToca.github.io//images/moebius/thinking.jpg" alt="Capitalism" title="to learn from our ancestors" />
-</p>
+<p><img src="http://patrickTocaORIGINAL.github.io//images/moebius/thinking.jpg" alt="Capitalism" title="to learn from our ancestors" /></p>
 
 <hr />
-<hr/><a href="http://patrickToca.github.io//english/about/">Disclaimer</a>]]></content>
+<hr/><a href="http://patrickTocaORIGINAL.github.io//english/about/">Disclaimer</a>]]></content>
 	  </entry>
   	
   
 	
   
 	
-  
-	
 	  <entry>
 	    <title type="html"><![CDATA[An Old Story, but Useful Lessons? Climate Change as of September 2013.]]></title>
-	    <link href="http://patrickToca.github.io//blog/english/2013/10/05/hansen-climate-sensitivity/"/>
+	    <link href="http://patrickTocaORIGINAL.github.io//blog/english/2013/10/05/hansen-climate-sensitivity/"/>
 	    <updated>2013-10-05T00:00:00+00:00</updated>
-	    <id>http://patrickToca.github.io//blog/english/2013/10/05/hansen-climate-sensitivity/</id>
+	    <id>http://patrickTocaORIGINAL.github.io//blog/english/2013/10/05/hansen-climate-sensitivity/</id>
 	    <content type="html"><![CDATA[<p><a href="http://www.columbia.edu/~jeh1/mailings/2013/20130926_PTRSpaperDiscussion.pdf" target="_blank">original document</a></p>
 
 <hr />
 
-<p><img src="http://patrickToca.github.io//images/moebius/panel-3.jpg" alt="Climate" title="Climate change, an old story." />
-</p>
+<p><img src="http://patrickTocaORIGINAL.github.io//images/moebius/panel-3.jpg" alt="Climate" title="Climate change, an old story." /></p>
 
 <hr />
 
@@ -2033,8 +2100,7 @@ James Hansen
 
 <hr />
 
-<p><img src="http://patrickToca.github.io//images/blog/climateChange-anOldStory/20130926_PTRSpaperDiscussion.bmp" alt="ClimateChange" title="Climate change, an old story." />
-</p>
+<p><img src="http://patrickTocaORIGINAL.github.io//images/blog/climateChange-anOldStory/20130926_PTRSpaperDiscussion.bmp" alt="ClimateChange" title="Climate change, an old story." /></p>
 
 <hr />
 
@@ -2134,7 +2200,7 @@ Data for this and other figures are available in the electronic Supplementary Ma
 <p>viii Goldblatt C, Watson AJ, 2012: The runaway greenhouse: implications for future climate change, geoengineering and planetary atmospheres. Phil. Trans. R. Soc. A 370, 4197-4216.</p>
 
 <p>ix Sherwood, SC, and Huber, M. An adaptability limit to climate change due to heat stress. Proc Natl Acad Sci USA 2010, 107:9552-9555.</p>
-<hr/><a href="http://patrickToca.github.io//english/about/">Disclaimer</a>]]></content>
+<hr/><a href="http://patrickTocaORIGINAL.github.io//english/about/">Disclaimer</a>]]></content>
 	  </entry>
   	
   
@@ -2143,15 +2209,14 @@ Data for this and other figures are available in the electronic Supplementary Ma
 	
 	  <entry>
 	    <title type="html"><![CDATA[Iraq deaths]]></title>
-	    <link href="http://patrickToca.github.io//blog/english/2013/09/16/justice-foreign-policy/"/>
+	    <link href="http://patrickTocaORIGINAL.github.io//blog/english/2013/09/16/justice-foreign-policy/"/>
 	    <updated>2013-09-16T00:00:00+00:00</updated>
-	    <id>http://patrickToca.github.io//blog/english/2013/09/16/justice-foreign-policy/</id>
+	    <id>http://patrickTocaORIGINAL.github.io//blog/english/2013/09/16/justice-foreign-policy/</id>
 	    <content type="html"><![CDATA[<p><a href="http://www.justforeignpolicy.org/iraq/" target="_blank">original source</a></p>
 
 <hr />
 
-<p><img src="http://patrickToca.github.io//images/moebius/theFall.jpg" alt="statut politique" title="morts en Irak" />
-</p>
+<p><img src="http://patrickTocaORIGINAL.github.io//images/moebius/theFall.jpg" alt="statut politique" title="morts en Irak" /></p>
 
 <hr />
 
@@ -2170,7 +2235,7 @@ Data for this and other figures are available in the electronic Supplementary Ma
 <p>This devastating human toll demands greater recognition. It eclipses the Rwandan genocide and our leaders are directly responsible. Little wonder they do not publicly cite it.</p>
 
 <p>The death counter provides a rough daily update of this number based on a rate of increase derived from the <a href="http://www.iraqbodycount.org/about/" target="_blank"><strong>«Iraq Body Count»</strong></a>.</p>
-<hr/><a href="http://patrickToca.github.io//english/about/">Disclaimer</a>]]></content>
+<hr/><a href="http://patrickTocaORIGINAL.github.io//english/about/">Disclaimer</a>]]></content>
 	  </entry>
   	
   
@@ -2179,15 +2244,14 @@ Data for this and other figures are available in the electronic Supplementary Ma
 	
 	  <entry>
 	    <title type="html"><![CDATA[Go data structures: Interfaces.]]></title>
-	    <link href="http://patrickToca.github.io//blog/english/2013/09/14/go-data-structures-interfaces/"/>
+	    <link href="http://patrickTocaORIGINAL.github.io//blog/english/2013/09/14/go-data-structures-interfaces/"/>
 	    <updated>2013-09-14T00:00:00+00:00</updated>
-	    <id>http://patrickToca.github.io//blog/english/2013/09/14/go-data-structures-interfaces/</id>
+	    <id>http://patrickTocaORIGINAL.github.io//blog/english/2013/09/14/go-data-structures-interfaces/</id>
 	    <content type="html"><![CDATA[<p><a href="http://research.swtch.com/interfaces/" target="_blank">original document</a></p>
 
 <hr />
 
-<p><img src="http://patrickToca.github.io//images/blog/go-data-structures-interfaces/Interfaces.jpg" alt="Interfaces" title="Interfaces" />
-</p>
+<p><img src="http://patrickTocaORIGINAL.github.io//images/blog/go-data-structures-interfaces/Interfaces.jpg" alt="Interfaces" title="Interfaces" /></p>
 
 <hr />
 
@@ -2270,13 +2334,11 @@ func (i Binary) Get() uint64 {
 
 <p>As a warmup, a value of type Binary is just a 64-bit integer made up of two 32-bit words (like in the <a href="http://research.swtch.com/2009/11/go-data-structures.html" target="_blank">last post</a>, we&rsquo;ll assume a 32-bit machine; this time memory grows down instead of to the right):</p>
 
-<p><img src="http://patrickToca.github.io//images/blog/go-data-structures-interfaces/gointer1.png" alt="Interfaces" title="gointer1" />
-</p>
+<p><img src="http://patrickTocaORIGINAL.github.io//images/blog/go-data-structures-interfaces/gointer1.png" alt="Interfaces" title="gointer1" /></p>
 
 <p>Interface values are represented as a two-word pair giving a pointer to information about the type stored in the interface and a pointer to the associated data. Assigning b to an interface value of type Stringer sets both words of the interface value.</p>
 
-<p><img src="http://patrickToca.github.io//images/blog/go-data-structures-interfaces/gointer2.png" alt="Interfaces" title="gointer2" />
-</p>
+<p><img src="http://patrickTocaORIGINAL.github.io//images/blog/go-data-structures-interfaces/gointer2.png" alt="Interfaces" title="gointer2" /></p>
 
 <p>(The pointers contained in the interface value are gray to emphasize that they are implicit, not directly exposed to Go programs.)</p>
 
@@ -2303,22 +2365,19 @@ s.tab-&gt;fun[0](s.data) : it calls the appropriate function pointer from the it
 
 <p>First, if the interface type involved is empty—it has no methods—then the itable serves no purpose except to hold the pointer to the original type. In this case, the itable can be dropped and the value can point at the type directly:</p>
 
-<p><img src="http://patrickToca.github.io//images/blog/go-data-structures-interfaces/gointer3.png" alt="Interfaces" title="gointer3" />
-</p>
+<p><img src="http://patrickTocaORIGINAL.github.io//images/blog/go-data-structures-interfaces/gointer3.png" alt="Interfaces" title="gointer3" /></p>
 
 <p>Whether an interface type has methods is a static property—either the type in the source code says interface{} or it says interace{ methods&hellip; }—so the compiler knows which representation is in use at each point in the program.</p>
 
 <p>Second, if the value associated with the interface value can fit in a single machine word, there&rsquo;s no need to introduce the indirection or the heap allocation. If we define Binary32 to be like Binary but implemented as a uint32, it could be stored in an interface value by keeping the actual value in the second word:</p>
 
-<p><img src="http://patrickToca.github.io//images/blog/go-data-structures-interfaces/gointer4.png" alt="Interfaces" title="gointer4" />
-</p>
+<p><img src="http://patrickTocaORIGINAL.github.io//images/blog/go-data-structures-interfaces/gointer4.png" alt="Interfaces" title="gointer4" /></p>
 
 <p>Whether the actual value is being pointed at or inlined depends on the size of the type. The compiler arranges for the functions listed in the type&rsquo;s method table (which get copied into the itables) to do the right thing with the word that gets passed in. If the receiver type fits in a word, it is used directly; if not, it is dereferenced. The diagrams show this: in the Binary version far above, the method in the itable is (*Binary).String, while in the Binary32 example, the method in the itable is Binary32.String not (*Binary32).String.</p>
 
 <p>Of course, empty interfaces holding word-sized (or smaller) values can take advantage of both optimizations:</p>
 
-<p><img src="http://patrickToca.github.io//images/blog/go-data-structures-interfaces/gointer5.png" alt="Interfaces" title="gointer5" />
-</p>
+<p><img src="http://patrickTocaORIGINAL.github.io//images/blog/go-data-structures-interfaces/gointer5.png" alt="Interfaces" title="gointer5" /></p>
 
 <p><strong>Method Lookup Performance</strong></p>
 
@@ -2385,22 +2444,21 @@ func main() {
 </code></pre>
 
 <p>The LEAL loads the address of s into the register BX. (The notation n(SP) describes the word in memory at SP+n. 0(SP) can be shortened to (SP).) The next two MOVL instructions fetch the value from the second word in the interface and store it as the first function call argument, 0(SP). The final two MOVL instructions fetch the itable and then the function pointer from the itable, in preparation for calling that function.</p>
-<hr/><a href="http://patrickToca.github.io//english/about/">Disclaimer</a>]]></content>
+<hr/><a href="http://patrickTocaORIGINAL.github.io//english/about/">Disclaimer</a>]]></content>
 	  </entry>
   	
   
 	
 	  <entry>
 	    <title type="html"><![CDATA[Can Civilization Survive Capitalism? this question made me start this blog.]]></title>
-	    <link href="http://patrickToca.github.io//blog/english/2013/03/05/chomsky-on-capitalism/"/>
+	    <link href="http://patrickTocaORIGINAL.github.io//blog/english/2013/03/05/chomsky-on-capitalism/"/>
 	    <updated>2013-03-05T00:00:00+00:00</updated>
-	    <id>http://patrickToca.github.io//blog/english/2013/03/05/chomsky-on-capitalism/</id>
+	    <id>http://patrickTocaORIGINAL.github.io//blog/english/2013/03/05/chomsky-on-capitalism/</id>
 	    <content type="html"><![CDATA[<p><a href="http://www.alternet.org/noam-chomsky-can-civilization-survive-capitalism/" target="_blank">original document</a></p>
 
 <hr />
 
-<p><img src="http://patrickToca.github.io//images/moebius/moebius-arzac-750.jpg" alt="Capitalism" title="Capitalism" />
-</p>
+<p><img src="http://patrickTocaORIGINAL.github.io//images/moebius/moebius-arzac-750.jpg" alt="Capitalism" title="Capitalism" /></p>
 
 <hr />
 
@@ -2473,7 +2531,7 @@ func main() {
 <p>This observation generalizes: Throughout the world, indigenous societies are struggling to protect what they sometimes call &ldquo;the rights of nature,&rdquo; while the civilized and sophisticated scoff at this silliness.</p>
 
 <p>This is all exactly the opposite of what rationality would predict &ndash; unless it is the skewed form of reason that passes through the filter of RECD.</p>
-<hr/><a href="http://patrickToca.github.io//english/about/">Disclaimer</a>]]></content>
+<hr/><a href="http://patrickTocaORIGINAL.github.io//english/about/">Disclaimer</a>]]></content>
 	  </entry>
   	
   

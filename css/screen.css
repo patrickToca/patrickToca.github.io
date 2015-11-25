@@ -20,8 +20,8 @@ html, body {
     margin: 0;
     color: #fffc03;
     text-decoration: none;
-    text-shadow: 0 0 2px #ffffff, 0 0 5px #c2e5ff;
-    background: #0e3f86;
+    /*text-shadow: 0 0 2px #ffffff, 0 0 5px #c2e5ff;*/
+    background: #1462d5;
 }
 
 ::selection {
@@ -29,8 +29,8 @@ html, body {
     margin: 0;
     color: #fffc03;
     text-decoration: none;
-    text-shadow: 0 0 2px #ffffff, 0 0 5px #c2e5ff;
-    background: #0e3f86;
+    /*text-shadow: 0 0 2px #ffffff, 0 0 5px #c2e5ff;*/
+    background: #1462d5;
 }
 
 
